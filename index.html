@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10121c">
+<title>ماشین‌حساب نوا | NOVA</title>
+<style>
+:root{color-scheme:dark;--bg:#10121c;--surface:#191c2a;--panel:#202436;--key:#292e43;--key-hover:#363d57;--text:#f2f4ff;--muted:#a7aec9;--accent:#ab9cff;--accent-ink:#21164c;--line:#ffffff12;--danger:#ffb2b9;--shadow:0 24px 80px #0004;--mint:#9fe4d6}
+:root[data-theme=light]{color-scheme:light;--bg:#eef0f7;--surface:#fff;--panel:#f2f3fa;--key:#e8eaf4;--key-hover:#dce0f0;--text:#20243b;--muted:#636c8b;--accent:#6851d8;--accent-ink:#fff;--line:#18204312;--danger:#ad3449;--shadow:0 24px 80px #3a426618;--mint:#247969}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:var(--bg);color:var(--text);font:15px Tahoma,Arial,sans-serif;background-image:radial-gradient(ellipse at 12% 0%,#9480ff12,transparent 52%)}button,input{font:inherit}button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}button{border:0;color:var(--text)}.shell{max-width:1050px;margin:auto;padding:32px 22px 24px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:25px}.brand{display:flex;align-items:center;gap:12px}.mark{width:44px;height:44px;border-radius:15px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:bold 29px Arial;box-shadow:0 8px 24px #a18bff22}.brand h1{font-size:18px;margin:0 0 6px}.brand small{font:10px Arial;letter-spacing:3px;color:var(--muted)}.tools{display:flex;gap:8px}.icon{background:var(--panel);border:1px solid var(--line);border-radius:13px;min-width:42px;height:42px;font-size:19px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;direction:ltr;align-items:start}.calculator{direction:rtl;background:var(--surface);border:1px solid var(--line);padding:22px;border-radius:28px;box-shadow:var(--shadow)}.display{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin-bottom:16px}.status{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font:11px Arial;letter-spacing:1px;margin-bottom:24px}.status .dot{display:inline-block;width:6px;height:6px;background:var(--mint);border-radius:50%;margin-left:6px}.badge{color:var(--accent);background:var(--line);border-radius:6px;padding:4px 7px}.expression{display:block;width:100%;direction:ltr;text-align:right;font:clamp(24px,5vw,38px) ui-monospace,Consolas,monospace;color:var(--text);border:0;background:transparent;padding:0 0 8px;min-height:52px;border-radius:4px}.expression::placeholder{color:var(--muted)}.preview{direction:ltr;text-align:right;min-height:26px;overflow-wrap:anywhere;color:var(--mint);font:17px ui-monospace,Consolas,monospace}.preview.error{color:var(--danger);direction:rtl;font:12px Tahoma;line-height:1.8}.options{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.segmented{display:flex;direction:ltr;background:var(--panel);border-radius:10px;padding:3px}.segmented button{background:transparent;color:var(--muted);border-radius:8px;padding:7px 12px;font:12px Arial;font-weight:600}.segmented button.active{background:var(--accent);color:var(--accent-ink)}.text-btn{background:transparent;font-size:12px;color:var(--muted);padding:8px}.text-btn[aria-pressed=true]{color:var(--accent)}.memory{display:grid;grid-template-columns:repeat(5,1fr);direction:ltr;gap:5px;margin-bottom:10px}.memory button{background:transparent;font:12px Arial;color:var(--muted);padding:9px 0;border-radius:9px}.memory button:hover{background:var(--panel)}.science{display:grid;direction:ltr;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px}.science button{background:var(--panel);border-radius:11px;padding:12px 0;font:14px Arial;color:var(--muted)}.science[hidden]{display:none}.keys{display:grid;grid-template-columns:repeat(4,1fr);direction:ltr;gap:9px}.key{height:61px;border-radius:15px;background:var(--key);font:25px Arial;transition:background .12s,transform .1s}.key:hover{background:var(--key-hover)}.key:active,.science button:active{transform:scale(.94)}.key.op{background:#a28aff1b;color:var(--accent)}.key.clear{background:#fa8da012;color:var(--danger);font-size:18px}.key.equals{background:var(--accent);color:var(--accent-ink);font-size:30px}.key.equals:hover{filter:brightness(1.08)}.footnote{color:var(--muted);font-size:10px;text-align:center;line-height:1.9;margin:15px 0 0}.sidebar{direction:rtl;background:var(--surface);border:1px solid var(--line);border-radius:25px;padding:20px;min-height:330px}.side-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.side-head h2{font-size:14px;margin:0}.side-head button{background:transparent;color:var(--muted);font-size:12px;padding:6px}.history{display:flex;flex-direction:column;gap:10px;max-height:570px;overflow:auto}.empty{text-align:center;padding:45px 12px;color:var(--muted);font-size:12px;line-height:2.1}.empty span{display:block;font:40px Arial;opacity:.5;margin-bottom:15px}.record{width:100%;text-align:right;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px}.record .expr{direction:ltr;display:block;color:var(--muted);font:12px ui-monospace,monospace;overflow-wrap:anywhere}.record strong{display:block;direction:ltr;margin:10px 0 7px;font:20px ui-monospace,monospace;color:var(--text);overflow-wrap:anywhere}.record small{font-size:9px;color:var(--muted)}.side-tip{border-top:1px solid var(--line);margin-top:20px;padding-top:16px;color:var(--muted);font-size:11px;line-height:2}.bottom{margin-top:20px;display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:10px;line-height:1.9}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);padding:13px 20px;background:var(--text);color:var(--bg);border-radius:14px;font-size:12px;box-shadow:var(--shadow);z-index:5;max-width:90vw;text-align:center}.toast[hidden]{display:none}dialog{width:min(92vw,540px);max-height:85dvh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:22px;padding:24px;font-size:13px;line-height:2}dialog::backdrop{background:#0008;backdrop-filter:blur(5px)}dialog h2{font-size:18px}dialog code{direction:ltr;unicode-bidi:embed;color:var(--accent)}dialog .close{display:block;background:var(--accent);color:var(--accent-ink);padding:10px 25px;border-radius:10px;margin-top:20px}
+@media(min-width:760px){.sidebar{display:block!important}}@media(max-width:759px){.shell{max-width:540px;padding:6px 13px calc(56px + env(safe-area-inset-bottom))}.top{margin-bottom:18px}.workspace{grid-template-columns:minmax(0,1fr)}.calculator{padding:15px;border-radius:24px}.sidebar{display:none}.sidebar.open{display:block}.key{height:54px}.brand h1{font-size:16px}.display{padding:14px}.status{margin-bottom:12px}.bottom{font-size:9px}.history{max-height:320px}.science button{padding:11px 0}.icon{min-width:37px;height:37px}.mark{width:40px;height:40px}.tools{gap:5px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="top"><div class="brand"><div class="mark" aria-hidden="true">∑</div><div><h1>ماشین‌حساب نوا</h1><small>NOVA / SCIENTIFIC</small></div></div><div class="tools"><button class="icon" id="history-toggle" aria-label="نمایش تاریخچه" title="تاریخچه">◷</button><button class="icon" id="theme-toggle" aria-label="تغییر تم" title="تغییر تم">☼</button><button class="icon" id="help-toggle" aria-label="راهنما" title="راهنما">?</button></div></header>
+<div class="workspace"><section class="calculator" aria-label="ماشین‌حساب علمی">
+<div class="display"><div class="status"><span><i class="dot"></i>OFFLINE READY</span><span id="memory-state">M: EMPTY</span><span class="badge" id="angle-state">DEG</span></div><label for="expression" class="footnote" style="display:block;text-align:right;margin:0 0 8px">عبارت محاسبه</label><input id="expression" class="expression" type="text" inputmode="decimal" placeholder="0" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="500" dir="ltr" aria-describedby="preview"><div id="preview" class="preview" role="status" aria-live="polite">= 0</div></div>
+<div class="options"><div class="segmented" aria-label="واحد زاویه"><button id="deg" class="active" aria-pressed="true">DEG</button><button id="rad" aria-pressed="false">RAD</button></div><button class="text-btn" id="science-toggle" aria-pressed="true">توابع علمی ▾</button><button class="text-btn" id="copy">کپی نتیجه</button></div>
+<div class="memory" aria-label="حافظه"><button data-memory="clear" title="پاک‌کردن حافظه">MC</button><button data-memory="recall" title="فراخوانی حافظه">MR</button><button data-memory="add" title="افزودن به حافظه">M+</button><button data-memory="subtract" title="کسر از حافظه">M−</button><button data-memory="store" title="ذخیره در حافظه">MS</button></div>
+<div class="science" id="science"><button data-insert="sin(">sin</button><button data-insert="cos(">cos</button><button data-insert="tan(">tan</button><button data-insert="(">(</button><button data-insert=")">)</button><button data-insert="asin(">sin⁻¹</button><button data-insert="acos(">cos⁻¹</button><button data-insert="atan(">tan⁻¹</button><button data-insert="ln(">ln</button><button data-insert="log(">log</button><button data-insert="sqrt(">√</button><button data-insert="^2">x²</button><button data-insert="^">xʸ</button><button data-insert="exp(">eˣ</button><button data-insert="!">n!</button><button data-insert="pi">π</button><button data-insert="e">e</button><button data-insert="abs(">|x|</button><button data-action="reciprocal">1/x</button><button data-insert="ans">Ans</button></div>
+<div class="keys"><button class="key clear" data-action="clear">AC</button><button class="key clear" data-action="backspace" aria-label="حذف آخرین کاراکتر">⌫</button><button class="key op" data-insert="%">%</button><button class="key op" data-insert="/" aria-label="تقسیم">÷</button><button class="key" data-insert="7">7</button><button class="key" data-insert="8">8</button><button class="key" data-insert="9">9</button><button class="key op" data-insert="*" aria-label="ضرب">×</button><button class="key" data-insert="4">4</button><button class="key" data-insert="5">5</button><button class="key" data-insert="6">6</button><button class="key op" data-insert="-" aria-label="تفریق">−</button><button class="key" data-insert="1">1</button><button class="key" data-insert="2">2</button><button class="key" data-insert="3">3</button><button class="key op" data-insert="+" aria-label="جمع">+</button><button class="key" data-action="negate" aria-label="تغییر علامت">±</button><button class="key" data-insert="0">0</button><button class="key" data-insert=".">.</button><button class="key equals" data-action="equals" aria-label="محاسبه">=</button></div>
+<p class="footnote">محاسبهٔ زنده · بدون اینترنت · بدون کتابخانهٔ خارجی</p></section>
+<aside class="sidebar" id="sidebar" aria-label="تاریخچه"><div class="side-head"><h2>تاریخچهٔ محاسبات</h2><button id="clear-history">پاک‌کردن</button></div><div class="history" id="history"></div><div class="side-tip">برای استفادهٔ دوباره، روی هر نتیجه بزنید.<br>Ans = آخرین نتیجهٔ محاسبه‌شده<br>MC / MR = پاک‌کردن / فراخوانی حافظه</div></aside></div>
+<footer class="bottom"><span>طراحی‌شده برای تمرکز، از ساده تا علمی.</span><span dir="ltr">NOVA • v1.0</span></footer>
+</main>
+<dialog id="help"><h2>ساده، اما قدرتمند.</h2><p>عبارت را تایپ کنید یا از دکمه‌ها استفاده کنید. ترتیب عملیات: فاکتوریل و درصد، توان، علامت منفی، ضرب و تقسیم، جمع و تفریق. توان از راست محاسبه می‌شود.</p><p>نمونه‌ها:<br><code>2*(3+4) = 14</code><br><code>2pi ≈ 6.28318530718</code><br><code>sin(30) = 0.5</code> در حالت DEG<br><code>2^3^2 = 512</code><br><code>-2^2 = -4</code></p><p><b>درصد:</b> علامت % همیشه عدد یا عبارت قبل از خود را بر ۱۰۰ تقسیم می‌کند. بنابراین <code>200+10% = 200.1</code>؛ برای افزایش ۱۰ درصدی بنویسید <code>200*(1+10%)</code>.</p><p><b>توابع:</b> log لگاریتم پایهٔ ۱۰، ln لگاریتم طبیعی و sin⁻¹ تابع معکوس سینوس است. واحد توابع مثلثاتی با DEG/RAD تعیین می‌شود. فاکتوریل فقط برای اعداد صحیح ۰ تا ۱۷۰ پشتیبانی می‌شود. محاسبات در محدودهٔ اعداد حقیقی‌اند.</p><p><b>تایپ:</b> اعداد فارسی، π، ×، ÷ و علامت منفی استاندارد پشتیبانی می‌شوند. برای عدد علمی از <code>1e-6</code> استفاده کنید؛ <code>2*e</code> یعنی دو برابر ثابت اویلر. Enter یا = برای محاسبه و Escape برای پاک‌کردن است.</p><p><b>دقت:</b> محاسبات از اعداد ممیز شناور JavaScript استفاده می‌کنند. نمایش نتیجه تا ۱۲ رقم معنادار گرد می‌شود، اما Ans و حافظه دقت داخلی را حفظ می‌کنند. این نسخه برای حسابداری دقیق مالی، اعداد صحیح بسیار بزرگ یا محاسبات حساس مهندسی تضمین نشده است.</p><p><b>حریم خصوصی:</b> برنامه هیچ درخواست شبکه‌ای نمی‌فرستد. اگر مرورگر اجازه بدهد، ۴۰ محاسبهٔ اخیر، تنظیمات و حافظه فقط روی همین دستگاه ذخیره می‌شوند؛ پاک‌شدن داده‌های مرورگر آن‌ها را حذف می‌کند.</p><button class="close" id="close-help">متوجه شدم</button></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+<script id="engine">
+'use strict';
+// A small expression parser. No eval(), Function(), or executable user input.
+function normalizeExpression(text) {
+  return text.replace(/[۰-۹]/g,c=>String(c.charCodeAt(0)-1776))
+    .replace(/[٠-٩]/g,c=>String(c.charCodeAt(0)-1632))
+    .replace(/[×·]/g,'*').replace(/÷/g,'/').replace(/[−–]/g,'-')
+    .replace(/π/g,'pi').replace(/٪/g,'%').replace(/٫/g,'.').toLowerCase();
+}
+function evaluateExpression(raw, context = {}) {
+  const source = normalizeExpression(raw);
+  if (!source.trim()) throw new Error('یک عبارت وارد کنید.');
+  if (source.length > 500) throw new Error('عبارت بیش از حد طولانی است.');
+  const tokens=[]; let offset=0;
+  const funcs = new Set(['sin','cos','tan','asin','acos','atan','sqrt','ln','log','abs','exp']);
+  while(offset<source.length) {
+    const rest=source.slice(offset);
+    const whitespace=/^\s+/.exec(rest);
+    if(whitespace){offset+=whitespace[0].length;continue;}
+    const num=/^(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?/.exec(rest);
+    if(num){tokens.push({type:'number',value:Number(num[0])});offset+=num[0].length;continue;}
+    const name=/^[a-z]+/.exec(rest);
+    if(name){const value=name[0];if(!funcs.has(value)&&!['pi','e','ans'].includes(value))throw new Error('نام تابع یا ثابت شناخته‌شده نیست.');tokens.push({type:funcs.has(value)?'function':'constant',value});offset+=value.length;continue;}
+    const c=source[offset++];
+    if('+-*/^()%!'.includes(c))tokens.push({type:c});
+    else throw new Error('کاراکتر نامعتبر در عبارت.');
+  }
+  // Adjacent terms imply multiplication, e.g. 2pi, 2(3+4), (2)(3).
+  const expanded=[];
+  for(const token of tokens){const last=expanded.at(-1);const end=last&&['number','constant',')','!','%'].includes(last.type);const start=['number','constant','function','('].includes(token.type);if(end&&start){if(last.type==='number'&&token.type==='number')throw new Error('بین دو عدد عملگر بگذارید.');expanded.push({type:'*'});}expanded.push(token);}
+  expanded.push({type:'end'});let index=0,depth=0;
+  const peek=()=>expanded[index];
+  const next=()=>expanded[index++];
+  const finite=value=>{if(!Number.isFinite(value))throw new Error('نتیجه خارج از محدوده یا تعریف‌نشده است.');return Object.is(value,-0)?0:value;};
+  const angle=context.angle==='RAD'?'RAD':'DEG';
+  const toRad=x=>angle==='DEG'?x*Math.PI/180:x;
+  const fromRad=x=>angle==='DEG'?x*180/Math.PI:x;
+  function apply(name,x){let v;
+    switch(name){
+      case 'sin':v=Math.sin(toRad(x));break;
+      case 'cos':v=Math.cos(toRad(x));break;
+      case 'tan':{const r=toRad(x);if(Math.abs(Math.cos(r))<1e-14)throw new Error('تانژانت در این زاویه تعریف نشده است.');v=Math.tan(r);break;}
+      case 'asin':case 'acos':if(Math.abs(x)>1)throw new Error('ورودی تابع معکوس باید بین ۱− و ۱ باشد.');v=fromRad(name==='asin'?Math.asin(x):Math.acos(x));break;
+      case 'atan':v=fromRad(Math.atan(x));break;
+      case 'sqrt':if(x<0)throw new Error('ریشهٔ عدد منفی در اعداد حقیقی تعریف نشده است.');v=Math.sqrt(x);break;
+      case 'ln':case 'log':if(x<=0)throw new Error('ورودی لگاریتم باید مثبت باشد.');v=name==='ln'?Math.log(x):Math.log10(x);break;
+      case 'abs':v=Math.abs(x);break;
+      case 'exp':v=Math.exp(x);break;
+    }return finite(v);
+  }
+  function parse(min=0){
+    if(++depth>100)throw new Error('پرانتز یا عملیات تو‌در‌تو بیش از حد است.');
+    const t=next();let left;
+    if(t.type==='number')left=finite(t.value);
+    else if(t.type==='constant')left=t.value==='pi'?Math.PI:t.value==='e'?Math.E:finite(context.ans??0);
+    else if(t.type==='+'||t.type==='-')left=(t.type==='-'?-1:1)*parse(25);
+    else if(t.type==='('){left=parse();if(next().type!==')')throw new Error('پرانتز بسته پیدا نشد.');}
+    else if(t.type==='function'){if(next().type!=='(')throw new Error('بعد از تابع پرانتز باز بگذارید.');const x=parse();if(next().type!==')')throw new Error('پرانتز تابع را ببندید.');left=apply(t.value,x);}
+    else throw new Error('عبارت کامل نیست؛ عدد یا پرانتز را بررسی کنید.');
+    while(true){const op=peek().type;
+      if(op==='!'||op==='%'){
+        if(40<min)break;next();
+        if(op==='%')left=finite(left/100);
+        else {if(!Number.isInteger(left)||left<0||left>170)throw new Error('فاکتوریل فقط برای عدد صحیح ۰ تا ۱۷۰ است.');let result=1;for(let i=2;i<=left;i++)result*=i;left=finite(result);}
+        continue;
+      }
+      const bp={'+':10,'-':10,'*':20,'/':20,'^':30}[op];
+      if(bp===undefined||bp<min)break;
+      next();const right=parse(op==='^'?bp:bp+1);
+      if(op==='+')left+=right;
+      if(op==='-')left-=right;
+      if(op==='*')left*=right;
+      if(op==='/'){if(right===0)throw new Error('تقسیم بر صفر مجاز نیست.');left/=right;}
+      if(op==='^'){if(left===0&&right===0)throw new Error('صفر به توان صفر در این برنامه تعریف نشده است.');left=Math.pow(left,right);}
+      left=finite(left);
+    }
+    depth--;return finite(left);
+  }
+  const result=parse();if(peek().type!=='end')throw new Error('عملگر یا پرانتز اضافی در عبارت.');return result;
+}
+function formatNumber(value){if(value===0)return '0';return String(Number(value.toPrecision(12)));}
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const input=$('expression');
+const STORAGE='nova-calculator-v1';
+let saved={};try{saved=JSON.parse(localStorage.getItem(STORAGE)||'{}')||{};}catch{}
+let angle=saved.angle==='RAD'?'RAD':'DEG';
+let ans=Number.isFinite(saved.ans)?saved.ans:0;
+let memory=Number.isFinite(saved.memory)?saved.memory:null;
+let history=Array.isArray(saved.history)?saved.history.filter(x=>x&&typeof x.expression==='string'&&x.expression.length<=500&&Number.isFinite(x.value)).slice(0,40):[];
+let theme=saved.theme==='light'?'light':'dark';
+let completed=false,lastResult=null,toastTimer;
+function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({angle,ans,memory,history,theme}));}catch{}}
+function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2600);}
+function updateSettings(){document.documentElement.dataset.theme=theme;$('theme-toggle').textContent=theme==='dark'?'☼':'☾';$('angle-state').textContent=angle;['DEG','RAD'].forEach(mode=>{const b=$(mode.toLowerCase());b.classList.toggle('active',angle===mode);b.setAttribute('aria-pressed',String(angle===mode));});$('memory-state').textContent=memory===null?'M: EMPTY':'M: '+formatNumber(memory);document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#10121c':'#eef0f7';}
+function compute(){return evaluateExpression(input.value,{angle,ans});}
+function preview(showError=false){lastResult=null;$('preview').classList.remove('error');if(!input.value.trim()){$('preview').textContent='= 0';return;}try{lastResult=compute();$('preview').textContent='= '+formatNumber(lastResult);}catch(e){$('preview').textContent=showError?e.message:'…';$('preview').classList.toggle('error',showError);}}
+function setExpression(value){input.value=value;completed=false;preview();}
+function insert(value){
+  const start=input.selectionStart??input.value.length,end=input.selectionEnd??start;
+  let text=input.value,from=start,to=end;
+  if(completed&&start===end&&end===text.length){
+    if(/^[+*/^%!\-]/.test(value)){text='ans';from=to=3;}
+    else if(value===')'){completed=false;return;}
+    else {text='';from=to=0;}
+  }
+  const updated=text.slice(0,from)+value+text.slice(to);
+  if(updated.length>500){toast('حداکثر طول عبارت ۵۰۰ کاراکتر است.');return;}
+  input.value=updated;const pos=from+value.length;input.setSelectionRange(pos,pos);completed=false;preview();
+}
+function equals(){if(!input.value.trim())return;try{const expression=input.value;const value=compute();history.unshift({expression,value,angle,time:new Date().toISOString()});history=history.slice(0,40);ans=value;input.value=String(value);input.setSelectionRange(input.value.length,input.value.length);completed=true;preview();renderHistory();persist();}catch(e){preview(true);}}
+function action(name){
+  if(name==='equals')return equals();
+  if(name==='clear'){setExpression('');return;}
+  if(name==='backspace'){let a=input.selectionStart??input.value.length,b=input.selectionEnd??a;if(a===b)a=Math.max(0,a-1);input.value=input.value.slice(0,a)+input.value.slice(b);input.setSelectionRange(a,a);completed=false;preview();return;}
+  if(name==='negate'||name==='reciprocal'){if(!input.value.trim()){if(name==='negate')insert('-');else insert('1/(');return;}const value=completed?'ans':input.value;setExpression(name==='negate'?'-('+value+')':'1/('+value+')');}
+}
+function renderHistory(){const box=$('history');box.replaceChildren();if(!history.length){const empty=document.createElement('div');empty.className='empty';const symbol=document.createElement('span');symbol.textContent='◷';empty.append(symbol,document.createTextNode('اینجا شروعِ محاسبه‌های شماست.'),document.createElement('br'),document.createTextNode('نتیجه‌ها بعد از زدن = ثبت می‌شوند.'));box.append(empty);return;}
+  history.forEach(item=>{const b=document.createElement('button');b.className='record';const ex=document.createElement('span');ex.className='expr';ex.textContent=item.expression;const result=document.createElement('strong');result.textContent=formatNumber(item.value);const date=document.createElement('small');const d=new Date(item.time);date.textContent=(item.angle==='RAD'?'RAD':'DEG')+' · '+(Number.isNaN(d.getTime())?'':d.toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'}));b.append(ex,result,date);b.title='استفاده از نتیجه';b.addEventListener('click',()=>{input.value=String(item.value);input.setSelectionRange(input.value.length,input.value.length);completed=false;preview();toast('نتیجه به عبارت منتقل شد.');});box.append(b);});
+}
+document.querySelectorAll('[data-insert]').forEach(b=>b.addEventListener('click',()=>insert(b.dataset.insert)));
+document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>action(b.dataset.action)));
+document.querySelectorAll('[data-memory]').forEach(b=>b.addEventListener('click',()=>{const mode=b.dataset.memory;if(mode==='clear'){memory=null;toast('حافظه پاک شد.');}else if(mode==='recall'){if(memory===null){toast('حافظه خالی است.');return;}insert('('+String(memory)+')');return;}else{try{const v=input.value.trim()?compute():ans;const n=mode==='store'?v:(memory??0)+(mode==='subtract'?-v:v);if(!Number.isFinite(n))throw Error('عدد حافظه خارج از محدوده است.');memory=n;toast('حافظه به‌روز شد.');}catch(e){toast(e.message);return;}}updateSettings();persist();}));
+input.addEventListener('input',()=>{completed=false;preview();});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='='){e.preventDefault();equals();}if(e.key==='Escape'){e.preventDefault();action('clear');}});
+document.addEventListener('keydown',e=>{if(e.target===input||$('help').open||e.ctrlKey||e.metaKey||e.altKey||e.target instanceof HTMLButtonElement)return;if(e.key==='Enter'||e.key==='='){e.preventDefault();equals();}else if(e.key==='Escape'){action('clear');}else if(e.key==='Backspace'){e.preventDefault();action('backspace');}else if(/^[0-9.+*/^()%!\-]$/.test(e.key)){e.preventDefault();insert(e.key);}});
+['DEG','RAD'].forEach(mode=>$(mode.toLowerCase()).addEventListener('click',()=>{angle=mode;updateSettings();preview();persist();}));
+$('theme-toggle').addEventListener('click',()=>{theme=theme==='dark'?'light':'dark';updateSettings();persist();});
+$('science-toggle').addEventListener('click',()=>{const hidden=!$('science').hidden;$('science').hidden=hidden;$('science-toggle').setAttribute('aria-pressed',String(!hidden));$('science-toggle').textContent=hidden?'توابع علمی ▸':'توابع علمی ▾';});
+$('history-toggle').addEventListener('click',()=>{const panel=$('sidebar');panel.classList.toggle('open');if(window.innerWidth<760&&panel.classList.contains('open'))panel.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});});
+$('clear-history').addEventListener('click',()=>{if(history.length&&confirm('تمام تاریخچهٔ محاسبات پاک شود؟')){history=[];renderHistory();persist();}});
+$('copy').addEventListener('click',async()=>{try{const v=input.value.trim()?compute():ans;const text=String(v);if(window.NovaClipboard&&typeof window.NovaClipboard.copy==='function'){window.NovaClipboard.copy(text);toast('نتیجه کپی شد.');}else if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);toast('نتیجه کپی شد.');}else{const temp=document.createElement('textarea');temp.value=text;temp.style.position='fixed';temp.style.opacity='0';document.body.append(temp);temp.select();const done=document.execCommand('copy');temp.remove();if(!done)throw Error('کپی خودکار در این مرورگر مجاز نیست؛ نتیجه را دستی انتخاب کنید.');toast('نتیجه کپی شد.');}}catch(e){toast(e.message||'کپی انجام نشد.');}});
+$('help-toggle').addEventListener('click',()=>$('help').showModal());$('close-help').addEventListener('click',()=>$('help').close());
+updateSettings();renderHistory();preview();
+</script>
+</body>
+</html>
