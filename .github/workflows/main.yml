@@ -163,7 +163,7 @@ jobs:
                   root.setBackgroundColor(Color.rgb(16, 18, 28));
                   setContentView(root);
 
-                  // Keep buttons clear of system bars and display cutouts.
+                  // Keep calculator buttons clear of system bars.
                   root.setOnApplyWindowInsetsListener((view, insets) -> {
                       if (Build.VERSION.SDK_INT >= 30) {
                           android.graphics.Insets bars = insets.getInsets(
@@ -206,7 +206,7 @@ jobs:
 
                   webView.setWebChromeClient(new WebChromeClient());
 
-                  // Serve the bundled HTML locally, without internet access.
+                  // Serve bundled HTML locally without internet access.
                   webView.setWebViewClient(new WebViewClient() {
                       @Override
                       public boolean shouldOverrideUrlLoading(
@@ -329,33 +329,48 @@ jobs:
           set -euo pipefail
           umask 077
 
-          if [ -z "${KEYSTORE_BASE64:-}" ] || [ -z "${NOVA_STORE_PASSWORD:-}" ]; then
-            echo "Missing HECTOR or HECTOR1 repository secret."
+          if [ -z "${KEYSTORE_BASE64:-}" ]; then
+            echo "::error::Repository secret HECTOR is missing or empty."
+            exit 1
+          fi
+
+          if [ -z "${NOVA_STORE_PASSWORD:-}" ]; then
+            echo "::error::Repository secret HECTOR1 is missing or empty."
             exit 1
           fi
 
           python3 - <<'PY'
           import os
           import base64
+          import binascii
           from pathlib import Path
 
           data = ''.join(os.environ['KEYSTORE_BASE64'].split())
-          key = base64.b64decode(data, validate=True)
+
+          try:
+              key = base64.b64decode(data, validate=True)
+          except (binascii.Error, ValueError):
+              raise SystemExit(
+                  '::error::HECTOR is not valid Base64. '
+                  'Use the Base64 contents of the original keystore.'
+              )
 
           if not key:
-              raise SystemExit('HECTOR contains no key data.')
+              raise SystemExit('::error::HECTOR contains no key data.')
 
           Path(
               os.environ['RUNNER_TEMP'],
               'nova-release.jks'
           ).write_bytes(key)
+
+          print('Signing file restored. Checking password, format and alias...')
           PY
 
           keytool -list \
             -keystore "$RUNNER_TEMP/nova-release.jks" \
             -storetype PKCS12 \
             -storepass:env NOVA_STORE_PASSWORD \
-            -alias iirco > /dev/null
+            -alias iirco
 
       - name: Build signed APK and AAB
         env:
@@ -386,7 +401,10 @@ jobs:
           EXPECTED=$(openssl x509 -in "$RUNNER_TEMP/nova-cert.pem" -outform DER | sha256sum | cut -d ' ' -f 1)
           ACTUAL=$("$SIGNER" verify --print-certs "$APK" | awk '/Signer #1 certificate SHA-256 digest:/ {print $NF}')
 
-          test "$EXPECTED" = "$ACTUAL"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::APK certificate does not match the supplied signing key."
+            exit 1
+          fi
 
           mkdir -p release-output
           cp "$APK" release-output/NOVA-Calculator-v1.0-release.apk
@@ -407,4 +425,3 @@ jobs:
         if: always()
         shell: bash
         run: rm -f "$RUNNER_TEMP/nova-release.jks" "$RUNNER_TEMP/nova-cert.pem"
-        
