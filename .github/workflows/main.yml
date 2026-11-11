@@ -1,4 +1,4 @@
-name: Build NOVA APK
+name: Build NOVA Signed Release
 
 on:
   workflow_dispatch:
@@ -44,39 +44,23 @@ jobs:
           import shutil
 
           files = {
-              "settings.gradle": r'''
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
+              "settings.gradle": r'''pluginManagement {
+              repositories { google(); mavenCentral(); gradlePluginPortal() }
           }
-
           dependencyResolutionManagement {
               repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+              repositories { google(); mavenCentral() }
           }
-
           rootProject.name = 'NovaCalculator'
           include ':app'
           ''',
-
-              "build.gradle": r'''
-          plugins {
+              "build.gradle": r'''plugins {
               id 'com.android.application' version '8.7.3' apply false
           }
           ''',
-
-              "gradle.properties": r'''
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+              "gradle.properties": r'''org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
           ''',
-
-              "app/build.gradle": r'''
-          plugins {
+              "app/build.gradle": r'''plugins {
               id 'com.android.application'
           }
 
@@ -92,16 +76,31 @@ jobs:
                   versionName '1.0'
               }
 
+              signingConfigs {
+                  release {
+                      storeFile file(System.getenv('NOVA_KEYSTORE_FILE'))
+                      storePassword System.getenv('NOVA_STORE_PASSWORD')
+                      keyAlias 'iirco'
+                      keyPassword System.getenv('NOVA_STORE_PASSWORD')
+                      storeType 'PKCS12'
+                  }
+              }
+
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                      minifyEnabled false
+                  }
+              }
+
               compileOptions {
                   sourceCompatibility JavaVersion.VERSION_17
                   targetCompatibility JavaVersion.VERSION_17
               }
           }
           ''',
-
               "app/src/main/AndroidManifest.xml": r'''<?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <!-- Offline application: no INTERNET permission. -->
               <application
                   android:allowBackup="false"
                   android:label="ماشین‌حساب نوا"
@@ -114,37 +113,28 @@ jobs:
                       android:name=".MainActivity"
                       android:exported="true"
                       android:windowSoftInputMode="adjustResize">
-
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN" />
                           <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
-
                   </activity>
               </application>
           </manifest>
           ''',
-
-              "app/src/main/res/drawable/ic_nova.xml": r'''
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              "app/src/main/res/drawable/ic_nova.xml": r'''<vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="108dp"
               android:height="108dp"
               android:viewportWidth="108"
               android:viewportHeight="108">
-
               <path
                   android:fillColor="#10121C"
                   android:pathData="M0,0h108v108h-108z" />
-
               <path
                   android:fillColor="#AB9CFF"
                   android:pathData="M30,25h48v10h-31l19,19 -19,19h31v10h-48v-10l19,-19 -19,-19z" />
-
           </vector>
           ''',
-
-              "app/src/main/java/com/nova/offlinecalculator/MainActivity.java": r'''
-          package com.nova.offlinecalculator;
+              "app/src/main/java/com/nova/offlinecalculator/MainActivity.java": r'''package com.nova.offlinecalculator;
 
           import android.app.Activity;
           import android.os.Build;
@@ -173,7 +163,7 @@ jobs:
                   root.setBackgroundColor(Color.rgb(16, 18, 28));
                   setContentView(root);
 
-                  // Keep content outside navigation bars, status bars and cutouts.
+                  // Keep buttons clear of system bars and display cutouts.
                   root.setOnApplyWindowInsetsListener((view, insets) -> {
                       if (Build.VERSION.SDK_INT >= 30) {
                           android.graphics.Insets bars = insets.getInsets(
@@ -216,30 +206,27 @@ jobs:
 
                   webView.setWebChromeClient(new WebChromeClient());
 
-                  // Serve the HTTPS page from bundled assets, not the internet.
+                  // Serve the bundled HTML locally, without internet access.
                   webView.setWebViewClient(new WebViewClient() {
                       @Override
                       public boolean shouldOverrideUrlLoading(
-                          WebView view,
-                          WebResourceRequest request
+                          WebView view, WebResourceRequest req
                       ) {
-                          return !HOME.equals(request.getUrl().toString());
+                          return !HOME.equals(req.getUrl().toString());
                       }
 
                       @Override
                       public boolean shouldOverrideUrlLoading(
-                          WebView view,
-                          String url
+                          WebView view, String url
                       ) {
                           return !HOME.equals(url);
                       }
 
                       @Override
                       public WebResourceResponse shouldInterceptRequest(
-                          WebView view,
-                          WebResourceRequest request
+                          WebView view, WebResourceRequest req
                       ) {
-                          if (HOME.equals(request.getUrl().toString())) {
+                          if (HOME.equals(req.getUrl().toString())) {
                               try {
                                   WebResourceResponse response =
                                       new WebResourceResponse(
@@ -277,20 +264,16 @@ jobs:
                       }
                   });
 
-                  // Clipboard bridge available only to the bundled page.
                   webView.addJavascriptInterface(new Object() {
                       @JavascriptInterface
                       public void copy(String value) {
-                          if (value == null || value.length() > 1000) {
-                              return;
-                          }
+                          if (value == null || value.length() > 1000) return;
 
                           runOnUiThread(() -> {
                               ClipboardManager clipboard =
                                   (ClipboardManager) getSystemService(
                                       Context.CLIPBOARD_SERVICE
                                   );
-
                               clipboard.setPrimaryClip(
                                   ClipData.newPlainText("NOVA result", value)
                               );
@@ -304,18 +287,14 @@ jobs:
 
               @Override
               protected void onPause() {
-                  if (webView != null) {
-                      webView.onPause();
-                  }
+                  if (webView != null) webView.onPause();
                   super.onPause();
               }
 
               @Override
               protected void onResume() {
                   super.onResume();
-                  if (webView != null) {
-                      webView.onResume();
-                  }
+                  if (webView != null) webView.onResume();
               }
 
               @Override
@@ -328,7 +307,7 @@ jobs:
                   super.onDestroy();
               }
           }
-          '''
+          ''',
           }
 
           for name, content in files.items():
@@ -341,16 +320,91 @@ jobs:
           shutil.copyfile("index.html", assets / "index.html")
           PY
 
-      - name: Build test APK
-        run: gradle --no-daemon :app:assembleDebug
+      - name: Restore and check signing key
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.HECTOR }}
+          NOVA_STORE_PASSWORD: ${{ secrets.HECTOR1 }}
+        run: |
+          set -euo pipefail
+          umask 077
 
-      - name: Name APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk NOVA-Calculator-debug.apk
+          if [ -z "${KEYSTORE_BASE64:-}" ] || [ -z "${NOVA_STORE_PASSWORD:-}" ]; then
+            echo "Missing HECTOR or HECTOR1 repository secret."
+            exit 1
+          fi
 
-      - name: Upload APK
+          python3 - <<'PY'
+          import os
+          import base64
+          from pathlib import Path
+
+          data = ''.join(os.environ['KEYSTORE_BASE64'].split())
+          key = base64.b64decode(data, validate=True)
+
+          if not key:
+              raise SystemExit('HECTOR contains no key data.')
+
+          Path(
+              os.environ['RUNNER_TEMP'],
+              'nova-release.jks'
+          ).write_bytes(key)
+          PY
+
+          keytool -list \
+            -keystore "$RUNNER_TEMP/nova-release.jks" \
+            -storetype PKCS12 \
+            -storepass:env NOVA_STORE_PASSWORD \
+            -alias iirco > /dev/null
+
+      - name: Build signed APK and AAB
+        env:
+          NOVA_KEYSTORE_FILE: ${{ runner.temp }}/nova-release.jks
+          NOVA_STORE_PASSWORD: ${{ secrets.HECTOR1 }}
+        run: gradle --no-daemon :app:assembleRelease :app:bundleRelease
+
+      - name: Verify release signatures
+        shell: bash
+        env:
+          NOVA_STORE_PASSWORD: ${{ secrets.HECTOR1 }}
+        run: |
+          set -euo pipefail
+
+          APK="app/build/outputs/apk/release/app-release.apk"
+          AAB="app/build/outputs/bundle/release/app-release.aab"
+          SIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+
+          "$SIGNER" verify --verbose --print-certs "$APK"
+          jarsigner -verify "$AAB"
+
+          keytool -exportcert -rfc \
+            -keystore "$RUNNER_TEMP/nova-release.jks" \
+            -storetype PKCS12 \
+            -storepass:env NOVA_STORE_PASSWORD \
+            -alias iirco > "$RUNNER_TEMP/nova-cert.pem"
+
+          EXPECTED=$(openssl x509 -in "$RUNNER_TEMP/nova-cert.pem" -outform DER | sha256sum | cut -d ' ' -f 1)
+          ACTUAL=$("$SIGNER" verify --print-certs "$APK" | awk '/Signer #1 certificate SHA-256 digest:/ {print $NF}')
+
+          test "$EXPECTED" = "$ACTUAL"
+
+          mkdir -p release-output
+          cp "$APK" release-output/NOVA-Calculator-v1.0-release.apk
+          cp "$AAB" release-output/NOVA-Calculator-v1.0-release.aab
+
+          cd release-output
+          sha256sum *.apk *.aab > SHA256SUMS.txt
+
+      - name: Upload signed release
         uses: actions/upload-artifact@v4
         with:
-          name: NOVA-Calculator-APK
-          path: NOVA-Calculator-debug.apk
+          name: NOVA-Signed-Release-v1.0
+          path: release-output/
           if-no-files-found: error
           retention-days: 30
+
+      - name: Remove temporary signing files
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/nova-release.jks" "$RUNNER_TEMP/nova-cert.pem"
+        
