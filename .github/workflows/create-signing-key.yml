@@ -1,0 +1,79 @@
+name: Create signing key ONE TIME
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'For a NEW signing key only. Type CREATE'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: create-android-signing-key
+  cancel-in-progress: false
+
+jobs:
+  create-key:
+    if: github.event.inputs.confirmation == 'CREATE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Generate signing key
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.HECTOR1 }}
+        run: |
+          set -euo pipefail
+          umask 077
+
+          if [ -z "${KEYSTORE_PASSWORD:-}" ]; then
+            echo "::error::Set repository secret HECTOR1 first."
+            exit 1
+          fi
+
+          if [ "${#KEYSTORE_PASSWORD}" -lt 12 ]; then
+            echo "::error::HECTOR1 must contain at least 12 characters."
+            exit 1
+          fi
+
+          mkdir -p "$RUNNER_TEMP/signing-export"
+
+          keytool -genkeypair \
+            -keystore "$RUNNER_TEMP/signing-export/iirco-release.jks" \
+            -storetype PKCS12 \
+            -storepass:env KEYSTORE_PASSWORD \
+            -keypass:env KEYSTORE_PASSWORD \
+            -alias iirco \
+            -keyalg RSA \
+            -keysize 3072 \
+            -validity 10000 \
+            -dname 'CN=NOVA'
+
+          base64 -w 0 \
+            "$RUNNER_TEMP/signing-export/iirco-release.jks" \
+            > "$RUNNER_TEMP/signing-export/HECTOR-base64.txt"
+
+          echo "Signing key created. Download and back it up securely."
+
+      - name: Download key and back up securely
+        uses: actions/upload-artifact@v4
+        with:
+          name: PRIVATE-signing-key-${{ github.run_id }}
+          path: ${{ runner.temp }}/signing-export/
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Clean runner copy
+        if: always()
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/signing-export"
