@@ -12,6 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,6 +25,8 @@ jobs:
 
       - name: Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       - name: Install SDK packages
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
@@ -37,25 +40,305 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import json, pathlib, shutil
-          files = json.loads(r'''
-          {
-            "settings.gradle": "pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }\ndependencyResolutionManagement {\n    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n    repositories { google(); mavenCentral() }\n}\nrootProject.name = 'NovaCalculator'\ninclude ':app'\n",
-            "build.gradle": "plugins { id 'com.android.application' version '8.7.3' apply false }\n",
-            "gradle.properties": "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8\n",
-            "app/build.gradle": "plugins { id 'com.android.application' }\nandroid {\n    namespace 'com.nova.offlinecalculator'\n    compileSdk 35\n    defaultConfig {\n        applicationId 'com.nova.offlinecalculator'\n        minSdk 23\n        targetSdk 35\n        versionCode 1\n        versionName '1.0'\n    }\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }\n}\n",
-            "app/src/main/AndroidManifest.xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\">\n    <!-- No INTERNET permission. All content is bundled with the APK. -->\n    <application android:allowBackup=\"false\" android:label=\"ماشین‌حساب نوا\"\n        android:icon=\"@drawable/ic_nova\" android:supportsRtl=\"true\"\n        android:usesCleartextTraffic=\"false\" android:theme=\"@android:style/Theme.Material.NoActionBar\">\n        <activity android:name=\".MainActivity\" android:exported=\"true\"\n            android:windowSoftInputMode=\"adjustResize\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n    </application>\n</manifest>\n",
-            "app/src/main/res/drawable/ic_nova.xml": "<vector xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    android:width=\"108dp\" android:height=\"108dp\" android:viewportWidth=\"108\" android:viewportHeight=\"108\">\n    <path android:fillColor=\"#10121C\" android:pathData=\"M0,0h108v108h-108z\" />\n    <path android:fillColor=\"#AB9CFF\" android:pathData=\"M30,25h48v10h-31l19,19 -19,19h31v10h-48v-10l19,-19 -19,-19z\" />\n</vector>\n",
-            "app/src/main/java/com/nova/offlinecalculator/MainActivity.java": "package com.nova.offlinecalculator;\n\nimport android.app.Activity;\nimport android.os.Build;\nimport android.os.Bundle;\nimport android.graphics.Color;\nimport android.content.ClipData;\nimport android.content.ClipboardManager;\nimport android.content.Context;\nimport android.view.WindowInsets;\nimport android.webkit.*;\nimport android.widget.FrameLayout;\nimport java.io.ByteArrayInputStream;\nimport java.io.IOException;\n\npublic class MainActivity extends Activity {\n    private static final String HOME = \"https://appassets.androidplatform.net/index.html\";\n    private WebView webView;\n\n    @Override public void onCreate(Bundle state) {\n        super.onCreate(state);\n        FrameLayout root = new FrameLayout(this);\n        root.setBackgroundColor(Color.rgb(16, 18, 28));\n        setContentView(root);\n        // Native insets keep ALL calculator buttons outside system bars and cutouts.\n        root.setOnApplyWindowInsetsListener((view, insets) -> {\n            if (Build.VERSION.SDK_INT >= 30) {\n                android.graphics.Insets bars = insets.getInsets(\n                    WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout()\n                    | WindowInsets.Type.ime());\n                view.setPadding(bars.left, bars.top, bars.right, bars.bottom);\n            } else {\n                view.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),\n                    insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());\n            }\n            return insets;\n        });\n        webView = new WebView(this);\n        webView.setBackgroundColor(Color.rgb(16,18,28));\n        root.addView(webView, new FrameLayout.LayoutParams(-1,-1));\n        WebSettings settings = webView.getSettings();\n        settings.setJavaScriptEnabled(true);\n        settings.setDomStorageEnabled(true);\n        settings.setAllowFileAccess(false);\n        settings.setAllowContentAccess(false);\n        settings.setAllowFileAccessFromFileURLs(false);\n        settings.setAllowUniversalAccessFromFileURLs(false);\n        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);\n        settings.setJavaScriptCanOpenWindowsAutomatically(false);\n        webView.setWebChromeClient(new WebChromeClient());\n        // HTTPS origin is served exclusively from bundled assets, without networking.\n        webView.setWebViewClient(new WebViewClient() {\n            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {\n                return !HOME.equals(req.getUrl().toString());\n            }\n            @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {\n                return !HOME.equals(url);\n            }\n            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {\n                if (HOME.equals(req.getUrl().toString())) {\n                    try {\n                        WebResourceResponse response = new WebResourceResponse(\"text/html\", \"UTF-8\", getAssets().open(\"index.html\"));\n                        java.util.Map<String,String> headers = new java.util.HashMap<>();\n                        headers.put(\"Content-Security-Policy\", \"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; frame-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'\");\n                        response.setResponseHeaders(headers);\n                        return response;\n                    } catch (IOException ignored) { }\n                }\n                return new WebResourceResponse(\"text/plain\", \"UTF-8\", new ByteArrayInputStream(new byte[0]));\n            }\n        });\n        // Only the bundled page can run scripts. No arbitrary pages or frames are allowed.\n        webView.addJavascriptInterface(new Object() {\n            @JavascriptInterface public void copy(String value) {\n                if (value == null || value.length() > 1000) return;\n                runOnUiThread(() -> {\n                    ClipboardManager clipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);\n                    clipboard.setPrimaryClip(ClipData.newPlainText(\"NOVA result\", value));\n                });\n            }\n        }, \"NovaClipboard\");\n        webView.loadUrl(HOME);\n        root.requestApplyInsets();\n    }\n    @Override protected void onPause() {\n        if (webView != null) webView.onPause();\n        super.onPause();\n    }\n    @Override protected void onResume() {\n        super.onResume();\n        if (webView != null) webView.onResume();\n    }\n    @Override protected void onDestroy() {\n        if (webView != null) {\n            ((FrameLayout)webView.getParent()).removeView(webView);\n            webView.removeJavascriptInterface(\"NovaClipboard\");\n            webView.destroy();\n        }\n        super.onDestroy();\n    }\n}\n"
+          from pathlib import Path
+          import shutil
+
+          files = {
+              "settings.gradle": r'''
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
           }
-          ''')
+
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+
+          rootProject.name = 'NovaCalculator'
+          include ':app'
+          ''',
+
+              "build.gradle": r'''
+          plugins {
+              id 'com.android.application' version '8.7.3' apply false
+          }
+          ''',
+
+              "gradle.properties": r'''
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          ''',
+
+              "app/build.gradle": r'''
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace 'com.nova.offlinecalculator'
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId 'com.nova.offlinecalculator'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 1
+                  versionName '1.0'
+              }
+
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+          }
+          ''',
+
+              "app/src/main/AndroidManifest.xml": r'''<?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <!-- Offline application: no INTERNET permission. -->
+              <application
+                  android:allowBackup="false"
+                  android:label="ماشین‌حساب نوا"
+                  android:icon="@drawable/ic_nova"
+                  android:supportsRtl="true"
+                  android:usesCleartextTraffic="false"
+                  android:theme="@android:style/Theme.Material.NoActionBar">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:windowSoftInputMode="adjustResize">
+
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+
+                  </activity>
+              </application>
+          </manifest>
+          ''',
+
+              "app/src/main/res/drawable/ic_nova.xml": r'''
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+
+              <path
+                  android:fillColor="#10121C"
+                  android:pathData="M0,0h108v108h-108z" />
+
+              <path
+                  android:fillColor="#AB9CFF"
+                  android:pathData="M30,25h48v10h-31l19,19 -19,19h31v10h-48v-10l19,-19 -19,-19z" />
+
+          </vector>
+          ''',
+
+              "app/src/main/java/com/nova/offlinecalculator/MainActivity.java": r'''
+          package com.nova.offlinecalculator;
+
+          import android.app.Activity;
+          import android.os.Build;
+          import android.os.Bundle;
+          import android.graphics.Color;
+          import android.content.ClipData;
+          import android.content.ClipboardManager;
+          import android.content.Context;
+          import android.view.WindowInsets;
+          import android.webkit.*;
+          import android.widget.FrameLayout;
+          import java.io.ByteArrayInputStream;
+          import java.io.IOException;
+
+          public class MainActivity extends Activity {
+              private static final String HOME =
+                  "https://appassets.androidplatform.net/index.html";
+
+              private WebView webView;
+
+              @Override
+              public void onCreate(Bundle state) {
+                  super.onCreate(state);
+
+                  FrameLayout root = new FrameLayout(this);
+                  root.setBackgroundColor(Color.rgb(16, 18, 28));
+                  setContentView(root);
+
+                  // Keep content outside navigation bars, status bars and cutouts.
+                  root.setOnApplyWindowInsetsListener((view, insets) -> {
+                      if (Build.VERSION.SDK_INT >= 30) {
+                          android.graphics.Insets bars = insets.getInsets(
+                              WindowInsets.Type.systemBars()
+                              | WindowInsets.Type.displayCutout()
+                              | WindowInsets.Type.ime()
+                          );
+                          view.setPadding(
+                              bars.left, bars.top, bars.right, bars.bottom
+                          );
+                      } else {
+                          view.setPadding(
+                              insets.getSystemWindowInsetLeft(),
+                              insets.getSystemWindowInsetTop(),
+                              insets.getSystemWindowInsetRight(),
+                              insets.getSystemWindowInsetBottom()
+                          );
+                      }
+                      return insets;
+                  });
+
+                  webView = new WebView(this);
+                  webView.setBackgroundColor(Color.rgb(16, 18, 28));
+                  root.addView(
+                      webView,
+                      new FrameLayout.LayoutParams(-1, -1)
+                  );
+
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+                  settings.setAllowFileAccess(false);
+                  settings.setAllowContentAccess(false);
+                  settings.setAllowFileAccessFromFileURLs(false);
+                  settings.setAllowUniversalAccessFromFileURLs(false);
+                  settings.setMixedContentMode(
+                      WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                  );
+                  settings.setJavaScriptCanOpenWindowsAutomatically(false);
+
+                  webView.setWebChromeClient(new WebChromeClient());
+
+                  // Serve the HTTPS page from bundled assets, not the internet.
+                  webView.setWebViewClient(new WebViewClient() {
+                      @Override
+                      public boolean shouldOverrideUrlLoading(
+                          WebView view,
+                          WebResourceRequest request
+                      ) {
+                          return !HOME.equals(request.getUrl().toString());
+                      }
+
+                      @Override
+                      public boolean shouldOverrideUrlLoading(
+                          WebView view,
+                          String url
+                      ) {
+                          return !HOME.equals(url);
+                      }
+
+                      @Override
+                      public WebResourceResponse shouldInterceptRequest(
+                          WebView view,
+                          WebResourceRequest request
+                      ) {
+                          if (HOME.equals(request.getUrl().toString())) {
+                              try {
+                                  WebResourceResponse response =
+                                      new WebResourceResponse(
+                                          "text/html",
+                                          "UTF-8",
+                                          getAssets().open("index.html")
+                                      );
+
+                                  java.util.Map<String, String> headers =
+                                      new java.util.HashMap<>();
+
+                                  headers.put(
+                                      "Content-Security-Policy",
+                                      "default-src 'none'; "
+                                      + "script-src 'unsafe-inline'; "
+                                      + "style-src 'unsafe-inline'; "
+                                      + "img-src data:; "
+                                      + "frame-src 'none'; "
+                                      + "connect-src 'none'; "
+                                      + "form-action 'none'; "
+                                      + "base-uri 'none'"
+                                  );
+
+                                  response.setResponseHeaders(headers);
+                                  return response;
+                              } catch (IOException ignored) {
+                              }
+                          }
+
+                          return new WebResourceResponse(
+                              "text/plain",
+                              "UTF-8",
+                              new ByteArrayInputStream(new byte[0])
+                          );
+                      }
+                  });
+
+                  // Clipboard bridge available only to the bundled page.
+                  webView.addJavascriptInterface(new Object() {
+                      @JavascriptInterface
+                      public void copy(String value) {
+                          if (value == null || value.length() > 1000) {
+                              return;
+                          }
+
+                          runOnUiThread(() -> {
+                              ClipboardManager clipboard =
+                                  (ClipboardManager) getSystemService(
+                                      Context.CLIPBOARD_SERVICE
+                                  );
+
+                              clipboard.setPrimaryClip(
+                                  ClipData.newPlainText("NOVA result", value)
+                              );
+                          });
+                      }
+                  }, "NovaClipboard");
+
+                  webView.loadUrl(HOME);
+                  root.requestApplyInsets();
+              }
+
+              @Override
+              protected void onPause() {
+                  if (webView != null) {
+                      webView.onPause();
+                  }
+                  super.onPause();
+              }
+
+              @Override
+              protected void onResume() {
+                  super.onResume();
+                  if (webView != null) {
+                      webView.onResume();
+                  }
+              }
+
+              @Override
+              protected void onDestroy() {
+                  if (webView != null) {
+                      ((FrameLayout) webView.getParent()).removeView(webView);
+                      webView.removeJavascriptInterface("NovaClipboard");
+                      webView.destroy();
+                  }
+                  super.onDestroy();
+              }
+          }
+          '''
+          }
+
           for name, content in files.items():
-              path = pathlib.Path(name)
+              path = Path(name)
               path.parent.mkdir(parents=True, exist_ok=True)
-              path.write_text(content, encoding='utf-8')
-          assets = pathlib.Path('app/src/main/assets')
+              path.write_text(content, encoding="utf-8")
+
+          assets = Path("app/src/main/assets")
           assets.mkdir(parents=True, exist_ok=True)
-          shutil.copyfile('index.html', assets / 'index.html')
+          shutil.copyfile("index.html", assets / "index.html")
           PY
 
       - name: Build test APK
